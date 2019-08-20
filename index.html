@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html>
+	<head>
+	    <meta charset="utf-8">
+	    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+	    <meta name="keywords" content="用户注册" />
+		<title>账户绑定</title>
+	    <script src="js/mui.min.js"></script>
+	    <link href="css/mui.min.css" rel="stylesheet"/>
+	    <script type="text/javascript" charset="utf-8">
+	      	mui.init();
+	    </script>
+	</head>
+	<body>
+		<script>
+		    var openID = "";
+		    function getCurTime() {
+		        var curTime = new Date();
+		        var year = curTime.getFullYear();
+		        var month = curTime.getMonth() + 1;
+		        var day = curTime.getDate();
+		        var hour = curTime.getHours();
+		        var minute = curTime.getMinutes();
+		        var second = curTime.getSeconds();
+		
+		        var strTime = "";
+		        var strMonth = "";
+		        var strDay = "";
+		        var strHour = "";
+		        var strMinute = "";
+		        var strSecond = "";
+		
+		        if (month >= 0 && month < 10) {
+		            strMonth = "0" + month;
+		        }
+		        else {
+		            strMonth = month;
+		        }
+		
+		        if (day >= 0 && day < 10) {
+		            strDay = "0" + day;
+		        }
+		        else {
+		            strDay = day;
+		        }
+		
+		        if (hour >= 0 && hour < 10) {
+		            strHour = "0" + hour;
+		        } else {
+		            strHour = hour;
+		        }
+		
+		        if (minute >= 0 && minute < 10) {
+		            strMinute = "0" + minute;
+		        } else {
+		            strMinute = minute;
+		        }
+		
+		        if (second >= 0 && second < 10) {
+		            strSecond = "0" + second;
+		        } else {
+		            strSecond = second;
+		        }
+		
+		        strTime = year + "-" + strMonth + "-" + strDay + " " + strHour + ":" + strMinute + ":" + strSecond;
+		        return strTime;
+		    };
+		
+		    $(document).ready(function (e) {
+		        var paramList = window.location.search.slice(window.location.search.lastIndexOf("?") + 1);
+		        if (paramList != null) {
+		            openID = getParam(paramList, "openID");
+		        }
+		
+		        $("#btnOK").click(function () {
+		            var name = "";
+		            var pwd = "";
+		            var email = "";
+		            var phone = "";
+		            var userid = "";
+		            var company = "";
+		            var temp = "";
+		            var groupID = "0";
+		            var alarmFlag = "0";
+		            var alarmType = "0";
+		            var insertTime = "";
+		            var id = "";
+		            var other = "0";
+		            var strNumber = "0";
+		            if ($("#name").val()) {
+		                name = $("#name").val();
+		            } else {
+		                alert("姓名不能为空");
+		                return;
+		            }
+		
+		            if ($("#pwd").val()) {
+		                pwd = $("#pwd").val();
+		            } else {
+		                alert("密码不能为空");
+		                return;
+		            }
+		
+		            if ($("#email").val()) {
+		                email = $("#email").val();
+		            }
+		
+		            if ($("#phone").val()) {
+		                phone = $("#phone").val();
+		            } else {
+		                alert("电话号码不能为空");
+		                return;
+		            }
+		
+		            if ($("#userid").val()) {
+		                userid = $("#userid").val();
+		            } else {
+		                alert("账户不能为空");
+		                return;
+		            }
+		
+		            if ($("#company").val()) {
+		                company = $("#company").val();
+		            }
+		
+		            if (userid.length >= 23) {
+		                strNumber = userid.substring(17);
+		            }
+		
+		            if (openID == null || openID == "") {
+		                alert("微信号不能为空");
+		                return;
+		            }
+		
+		            insertTime = getCurTime();
+		            id = userid + "_" + insertTime;
+		
+		            temp = "{\"info\":";
+		            temp = temp + "{";
+		            temp = temp + "\"ID\":" + "\"" + id + "\"" + ",";
+		            temp = temp + "\"UserID\":" + "\"" + userid + "\"" + ",";
+		            temp = temp + "\"UserName\":" + "\"" + name + "\"" + ",";
+		            temp = temp + "\"Password\":" + "\"" + pwd + "\"" + ",";
+		            temp = temp + "\"Phone\":" + "\"" + phone + "\"" + ",";
+		            temp = temp + "\"Email\":" + "\"" + email + "\"" + ",";
+		            temp = temp + "\"Company\":" + "\"" + company + "\"" + ",";
+		            temp = temp + "\"GroupID\":" + "\"" + groupID + "\"" + ",";
+		            temp = temp + "\"AlarmFlag\":" + "\"" + alarmFlag + "\"" + ",";
+		            temp = temp + "\"AlarmType\":" + "\"" + alarmType + "\"" + ",";
+		            temp = temp + "\"State\":" + "\"" + "1" + "\"" + ",";
+		            temp = temp + "\"Other\":" + "\"" + other + "\"" + ",";
+		            temp = temp + "\"InsertTime\":" + "\"" + insertTime + "\"" + ",";
+		            temp = temp + "\"OpenID\":" + "\"" + openID + "\"" + ",";
+		            temp = temp + "\"Number\":" + "\"" + strNumber + "\"";
+		            temp = temp + "}}";
+		
+		            $.ajax({
+		                async: true,
+		                type: "post",
+		                url: "https://lly.gzsmarthome.cn/MonitorWebService.asmx/UserRegister",
+		                dataType: "json",
+		                contentType: "application/json;charset=utf-8",
+		                data: temp,
+		                success: function (result) {
+		                    var strJson = "";
+		                    strJson = result.d;
+		                    var jsonRes = JSON.parse(strJson);
+		                    alert(jsonRes.Message);
+		                    if (jsonRes.Code == "1") {
+		                        closeCurrentPage();
+		                    }
+		                },
+		                error: function (xhr, status, error) {
+		                    alert(error);
+		                }
+		            });
+		        });
+		
+		        $("#btnCancel").click(function () {
+		            var name = "";
+		            var pwd = "";
+		            var email = "";
+		            var phone = "";
+		            var userid = "";
+		            var company = "";
+		            var temp = "";
+		            var groupID = "0";
+		            var alarmFlag = "0";
+		            var alarmType = "0";
+		            var insertTime = "";
+		            var id = "";
+		            var other = "0";
+		            var strNumber = "0";
+		            if ($("#name").val()) {
+		                name = $("#name").val();
+		            } else {
+		                alert("姓名不能为空");
+		                return;
+		            }
+		
+		            if ($("#pwd").val()) {
+		                pwd = $("#pwd").val();
+		            } else {
+		                alert("密码不能为空");
+		                return;
+		            }
+		
+		            if ($("#email").val()) {
+		                email = $("#email").val();
+		            }
+		
+		            if ($("#phone").val()) {
+		                phone = $("#phone").val();
+		            } else {
+		                alert("电话号码不能为空");
+		                return;
+		            }
+		
+		            if ($("#userid").val()) {
+		                userid = $("#userid").val();
+		            } else {
+		                alert("账户不能为空");
+		                return;
+		            }
+		
+		            if ($("#company").val()) {
+		                company = $("#company").val();
+		            }
+		
+		            if (userid.length >= 23) {
+		                strNumber = userid.substring(17);
+		            }
+		
+		            if (openID == null || openID == "") {
+		                alert("微信号不能为空");
+		                return;
+		            }
+		
+		            insertTime = getCurTime();
+		            id = userid + "_" + insertTime;
+		
+		            temp = "{\"info\":";
+		            temp = temp + "{";
+		            temp = temp + "\"ID\":" + "\"" + id + "\"" + ",";
+		            temp = temp + "\"UserID\":" + "\"" + userid + "\"" + ",";
+		            temp = temp + "\"UserName\":" + "\"" + name + "\"" + ",";
+		            temp = temp + "\"Password\":" + "\"" + pwd + "\"" + ",";
+		            temp = temp + "\"Phone\":" + "\"" + phone + "\"" + ",";
+		            temp = temp + "\"Email\":" + "\"" + email + "\"" + ",";
+		            temp = temp + "\"Company\":" + "\"" + company + "\"" + ",";
+		            temp = temp + "\"GroupID\":" + "\"" + groupID + "\"" + ",";
+		            temp = temp + "\"AlarmFlag\":" + "\"" + alarmFlag + "\"" + ",";
+		            temp = temp + "\"AlarmType\":" + "\"" + alarmType + "\"" + ",";
+		            temp = temp + "\"State\":" + "\"" + "1" + "\"" + ",";
+		            temp = temp + "\"Other\":" + "\"" + other + "\"" + ",";
+		            temp = temp + "\"InsertTime\":" + "\"" + insertTime + "\"" + ",";
+		            temp = temp + "\"OpenID\":" + "\"" + openID + "\"" + ",";
+		            temp = temp + "\"Number\":" + "\"" + strNumber + "\"";
+		            temp = temp + "}}";
+		
+		            $.ajax({
+		                async: true,
+		                type: "post",
+		                url: "https://lly.gzsmarthome.cn/MonitorWebService.asmx/UserDelete",
+		                dataType: "json",
+		                contentType: "application/json;charset=utf-8",
+		                data: temp,
+		                success: function (result) {
+		                    var strJson = "";
+		                    strJson = result.d;
+		                    var jsonRes = JSON.parse(strJson);
+		                    alert(jsonRes.Message);
+		                    if (jsonRes.Code == "1") {
+		                        closeCurrentPage();
+		                    }
+		                },
+		                error: function (xhr, status, error) {
+		                    alert(error);
+		                }
+		            });
+		        });
+		
+		        $("#userid").click(function () {
+		            /*
+		            var phone = "";
+		            if ($("#phone").val()) {
+		                phone = $("#phone").val();
+		            }
+		
+		            var temp = "{\"Phone\":" + "\"" + phone + "\"}";
+		            $.ajax({
+		                async: true,
+		                type: "post",
+		                url: "MonitorWebService.asmx/GetRegisterID",
+		                dataType: "json",
+		                contentType: "application/json;charset=utf-8",
+		                data: temp,
+		                success: function (result) {
+		                    $("#userid").val(result.d);
+		                },
+		                error: function (xhr, status, error) {
+		                    alert(error);
+		                }
+		            });
+		            */
+		        });
+		    });
+		
+		    function closeCurrentPage() {
+		        var userAgent = navigator.userAgent;
+		        if (userAgent.indexOf("Firefox") != -1 || userAgent.indexOf("Chrome") != -1) {
+		            window.location.href = "about:blank";
+		            window.close();
+		        } else {
+		            window.opener = null;
+		            window.open("", "_self");
+		            window.close();
+		        }
+		    }
+		    function getParam(paramList, paramName) {
+		        var name = paramName + "=";
+		        var ca = '';
+		        if (paramList.indexOf("&") != -1) {
+		            var ca = paramList.split('&');
+		            for (var i = 0; i < ca.length; i++) {
+		                var c = ca[i];
+		                if (c.indexOf(name) == 0) {
+		                    return c.substring(name.length, c.length);
+		                }
+		            }
+		        } else {
+		            return paramList.substring(name.length, paramList.length);
+		        }
+		        return "";
+		    }
+		</script>
+		<form class="mui-input-group">
+		    <div class="mui-input-row">
+		        <label for="userid">用户名</label>
+		    <input type="text" id="userid" class="mui-input-clear" placeholder="请输入用户名">
+		    </div>
+		    <div class="mui-input-row">
+		        <label for="pwd">密码</label>
+		        <input type="password" id="pwd" class="mui-input-password" placeholder="请输入密码">
+		    </div>
+			<div class="mui-input-row">
+			    <label for="phone">电话</label>
+			    <input type="phone" id="phone" class="mui-input-clear" placeholder="请输入电话">
+			</div>
+			<div class="mui-input-row">
+			    <label for="email">邮箱</label>
+			    <input type="email" id="email" class="mui-input-clear" placeholder="请输入邮箱">
+			</div>
+			<div class="mui-input-row">
+			    <label for="name">姓名</label>
+			    <input type="name" id="name" class="mui-input-clear" placeholder="请输入姓名">
+			</div>
+			<div class="mui-input-row">
+			    <label for="company">单位</label>
+			    <input type="company" id="company" class="mui-input-clear" placeholder="请输入单位">
+			</div>
+		    <div class="mui-button-row">
+		        <button type="button" class="mui-btn mui-btn-primary" id="btnOK" >绑定</button>
+		        <button type="button" class="mui-btn mui-btn-danger" id="btnCancel">解绑</button>
+		    </div>
+		</form>
+	</body>
+</html>
